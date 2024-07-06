@@ -31,6 +31,8 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "home.apps.HomeConfig",
     "accounts.apps.AccountsConfig",
+    "post.apps.PostConfig",
+    "socialprofile.apps.SocialprofileConfig",
 ]
 
 MIDDLEWARE = [
