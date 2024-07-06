@@ -2,20 +2,19 @@ from rest_framework import serializers
 
 from .models import Post
 
+# class PostSerializer(serializers.ModelSerializer):
+#     author = serializers.SerializerMethodField()
+
+#     class Meta:
+#         model = Post
+#         fields = ["id", "content", "image", "created_at", "updated_at", "author"]
+#         read_only_fields = ["created_at", "updated_at", "author"]
+
 
 class PostSerializer(serializers.ModelSerializer):
-    author = serializers.SerializerMethodField()
-
     class Meta:
         model = Post
-        fields = [
-            "id",
-            "content",
-            "image",
-            "created_at",
-            "updated_at",
-            "author",
-        ]
+        fields = ["author", "content", "slug", "image", "created_at", "updated_at"]
 
     def validate_content(self, value):
         if len(value) < 10:
