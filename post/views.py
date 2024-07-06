@@ -60,7 +60,7 @@ class PostUpdateView(generics.UpdateAPIView):
 
         except PermissionError:
             return Response(
-                {"error": error_messages.UNAUTHORIZED_UPDATE},
+                {"error": error_messages.INACCESSIBILITY_UPDATE_ERROR},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -88,6 +88,46 @@ class PostListView(generics.ListAPIView):
         except Exception as e:
             print(error_messages.SERVER_ERROR)
             return Post.objects.none()
+
+
+class PostDestroyView(generics.DestroyAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser:
+            return Post.objects.all()
+        return Post.objects.filter(author=user)
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            pk = kwargs.get("pk")
+            post = Post.objects.get(pk=pk)
+
+            if not request.user.is_superuser and post.author != request.user:
+                raise PermissionError
+
+            post.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        except Post.DoesNotExist:
+            return Response(
+                {"error": error_messages.POST_NOT_FOUND},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        except PermissionError:
+            return Response(
+                {"error": error_messages.INACCESSIBILITY_DELETE_ERROR},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        except Exception as e:
+            return Response(
+                {"error": error_messages.SERVER_ERROR},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 class ExploreView(APIView):
