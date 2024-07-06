@@ -14,7 +14,15 @@ from .models import Post
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ["author", "content", "slug", "image", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "author",
+            "content",
+            "slug",
+            "image",
+            "created_at",
+            "updated_at",
+        ]
 
     def validate_content(self, value):
         if len(value) < 10:

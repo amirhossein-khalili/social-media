@@ -130,6 +130,17 @@ class PostDestroyView(generics.DestroyAPIView):
             )
 
 
+class PostDetailView(generics.RetrieveAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        pk = self.kwargs.get("pk")
+        post = get_object_or_404(Post, pk=pk)
+        return post
+
+
 class ExploreView(APIView):
 
     serializer_class = PostSerializer
