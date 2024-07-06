@@ -9,6 +9,9 @@ from permissions import IsOwnerReadOnly
 class Home(APIView):
     permission_classes = [AllowAny]
 
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request):
 
         return Response(data={"message": "hello world"}, status=status.HTTP_200_OK)
