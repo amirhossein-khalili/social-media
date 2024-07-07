@@ -33,3 +33,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     def get_author(self, obj):
         return {"username": obj.author.username, "email": obj.author.email}
+
+    def get_url(self, obj):
+        request = self.context.get("request")
+        return request.build_absolute_uri(obj.get_absolute_url())
