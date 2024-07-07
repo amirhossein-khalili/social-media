@@ -24,10 +24,3 @@ class UserAdmin(BaseUserAdmin):
     )
     search_fields = ("username", "email")
     list_display = ("username", "email", "first_name", "last_name", "is_staff")
-
-
-# @admin.site.register(Socialprofile)
-# class SocialprofileAdmin(admin.ModelAdmin):
-#     search_fields = ("user__username", "bio")
-#     list_display = ("user", "bio")
-#     raw_id_fields = ("user",)
