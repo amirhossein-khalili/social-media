@@ -12,3 +12,6 @@ class Post(models.Model):
 
     def __str__(self):
         return f"Post by {self.author.username} at {self.created_at}"
+
+    def get_absolute_url(self):
+        return reverse("post:detail", kwargs={"pk": self.pk})
