@@ -18,7 +18,6 @@ urlpatterns = [
     #########################################################################
     #
     path("api/post/", include("post.urls", namespace="post")),
-    path("api/socialprofile/", include("socialprofile.urls", namespace="socialprofile")),
     #
     #########################################################################
     #
