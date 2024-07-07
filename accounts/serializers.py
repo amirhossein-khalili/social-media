@@ -42,6 +42,23 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return data
 
 
+# class ResetPasswordRequestSerializer(serializers.Serializer):
+#     email = serializers.EmailField(required=True)
+
+
+# class ResetPasswordSerializer(serializers.Serializer):
+#     new_password = serializers.RegexField(
+#         regex=r"^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$",
+#         write_only=True,
+#         error_messages={
+#             "invalid": (
+#                 "رمز عبور باید حداقل 8 کاراکتر با حداقل یک حرف بزرگ و نماد باشد"
+#             )
+#         },
+#     )
+#     confirm_password = serializers.CharField(write_only=True, required=True)
+
+
 # class RegisterSerializer(serializers.ModelSerializer):
 #     repeat_password = serializers.CharField(required=True, write_only=True)
 
