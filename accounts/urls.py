@@ -8,6 +8,8 @@ app_name = "accounts"
 urlpatterns = [
     path("register/", views.UserRegister.as_view(), name="register"),
     path("login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("signup/step1/", views.SignupStepOneView.as_view(), name="signup_step_one"),
+    path("signup/step2/", views.SignupStepTwoView.as_view(), name="signup_step_two"),
     # path("resetPassword/", views.ResetPassword.as_view(), name="reset_password"),
     # path(
     #     "requestPasswordReset/",
