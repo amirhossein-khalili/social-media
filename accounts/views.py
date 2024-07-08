@@ -45,55 +45,60 @@ class SignupStepOneView(APIView):
     serializer_class = SignupStepOneSerializer
 
     def post(self, request):
-
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
-            data = data = request.data
-            email = data["email"]
+            email = serializer.validated_data["email"]
 
             verification_code = self.send_verification_code(email)
 
-            return Response(
-                {"message": "Verification code sent to email"},
-                status=status.HTTP_200_OK,
-            )
+            if verification_code:
+
+                # this part dont work
+                redis_instance.hset(
+                    f"signup_{email}",
+                    "email",
+                    serializer.validated_data["email"],
+                    "username",
+                    serializer.validated_data["username"],
+                    "password",
+                    serializer.validated_data["password"],
+                    "verification_code",
+                    verification_code,
+                )
+
+                return Response(
+                    {"message": "Verification code sent to email"},
+                    status=status.HTTP_200_OK,
+                )
+
+            else:
+                return Response(
+                    {
+                        "error": "Failed to send verification code. Please try again later."
+                    },
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def send_verification_code(self, user_email):
         try:
             code = code_generator()
 
-            print(
-                "verification in the amir social media",
-                f"this is your verification code babe :  {code}",
-                "amirhossein.khalili.supn@gmail.com",
-                [user_email],
-            )
             send_mail(
-                "verification in the amir social media",
-                f"this is your verification code babe :  {code}",
+                "Verification in the Amir Social Media",
+                f"This is your verification code: {code}",
                 "amirhossein.khalili.supn@gmail.com",
                 [user_email],
                 fail_silently=False,
-            )
-
-            print(
-                "_" * 50,
-                "\n",
-                code,
-                "\n",
-                "_" * 50,
             )
 
             return code
 
         except Exception as e:
             logger.error(f"Failed to send email: {e}")
-            return Response(
-                {"error": "Failed to send verification code. Please try again later."},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+            return None
 
 
 class SignupStepTwoView(APIView):
