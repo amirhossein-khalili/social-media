@@ -1,2 +1,2 @@
+from .code_generator import code_generator
 from .redis_client import redis_instance
-from .verification_code_sender import send_verification_code
