@@ -3,7 +3,9 @@ from django.db import models
 
 
 class Post(models.Model):
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="posts"
+    )
     content = models.TextField()
     slug = models.SlugField(max_length=20, default=None)
     image = models.ImageField(upload_to="post_images/", blank=True, null=True)
