@@ -2,6 +2,7 @@ import logging
 
 import redis
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions, status, views
@@ -54,17 +55,16 @@ class SignupStepOneView(APIView):
 
             if verification_code:
 
-                # this part dont work
-                redis_instance.hset(
-                    f"signup_{email}",
-                    "email",
-                    serializer.validated_data["email"],
-                    "username",
-                    serializer.validated_data["username"],
-                    "password",
-                    serializer.validated_data["password"],
-                    "verification_code",
+                cache.set(
+                    f"signup_{email}_user_data",
+                    serializer.validated_data,
+                    60,
+                )
+
+                cache.set(
+                    f"signup_{email}_verification_code",
                     verification_code,
+                    60,
                 )
 
                 return Response(
