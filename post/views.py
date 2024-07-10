@@ -76,18 +76,19 @@ class PostListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        user = self.request.user
-        try:
-            if user.is_superuser:
+        return Post.objects.all()
 
-                return Post.objects.all()
-            else:
+    # def get_queryset(self):
+    #     user = self.request.user
+    #     try:
+    #         if user.is_superuser:
+    #             return Post.objects.all()
+    #         else:
+    #             return Post.objects.filter(author=user)
 
-                return Post.objects.filter(author=user)
-
-        except Exception as e:
-            print(error_messages.SERVER_ERROR)
-            return Post.objects.none()
+    # except Exception as e:
+    #     print(error_messages.SERVER_ERROR)
+    #     return Post.objects.none()
 
 
 class PostDestroyView(generics.DestroyAPIView):
