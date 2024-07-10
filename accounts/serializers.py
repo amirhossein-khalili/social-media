@@ -31,6 +31,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     def validate_email(self, value):
         if "admin" in value:
             raise serializers.ValidationError("Email can't contain 'admin' !!")
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("This email is already taken!!")
         return value
 
     def validate(self, data):
@@ -60,8 +62,8 @@ class SignupStepOneSerializer(serializers.Serializer):
         return value
 
     def validate_email(self, value):
-        if "admin" in value:
-            raise serializers.ValidationError("Email can't contain 'admin' !!")
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("This email is already taken!!")
         return value
 
     def validate(self, data):
@@ -73,5 +75,14 @@ class SignupStepOneSerializer(serializers.Serializer):
 
 
 class SignupStepTwoSerializer(serializers.Serializer):
+
     email = serializers.EmailField()
+
     code = serializers.CharField(max_length=6)
+
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError(
+                "your signup is completed please use the login option"
+            )
+        return value
