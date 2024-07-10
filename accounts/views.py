@@ -15,6 +15,7 @@ from utils import code_generator, redis_instance
 
 from .models import User
 from .serializers import (
+    CustomTokenObtainPairSerializer,
     SignupStepOneSerializer,
     SignupStepTwoSerializer,
     UserRegisterSerializer,
@@ -223,3 +224,7 @@ class SignupStepTwoView(APIView):
         except Exception as e:
             logger.error(f"Failed to send email: {e}")
             return None
+
+
+class LoginView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
