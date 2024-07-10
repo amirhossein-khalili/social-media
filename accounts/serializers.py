@@ -1,7 +1,10 @@
+from typing import Any, Dict
+
 from django.contrib import auth
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
-from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.settings import api_settings
 
 from .models import User
 
@@ -86,3 +89,19 @@ class SignupStepTwoSerializer(serializers.Serializer):
                 "your signup is completed please use the login option"
             )
         return value
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs: Dict[str, Any]) -> Dict[str, str]:
+        data = super().validate(attrs)
+
+        refresh = self.get_token(self.user)
+
+        data["login-token"] = str(refresh.access_token)
+
+        if api_settings.UPDATE_LAST_LOGIN:
+            update_last_login(None, self.user)
+
+        data.pop("refresh", None)
+
+        return data
