@@ -18,31 +18,10 @@ from .serializers import (
     CustomTokenObtainPairSerializer,
     SignupStepOneSerializer,
     SignupStepTwoSerializer,
-    UserRegisterSerializer,
 )
 from .services import RelationFactory
 
 logger = logging.getLogger(__name__)
-
-
-class UserRegister(APIView):
-
-    serializer_class = UserRegisterSerializer
-
-    def post(self, request):
-
-        ser_data = UserRegisterSerializer(data=request.data)
-
-        if ser_data.is_valid():
-
-            user = ser_data.create(ser_data.validated_data)
-
-            return Response(
-                {"message": "User created successfully", "user": ser_data.data},
-                status=status.HTTP_201_CREATED,
-            )
-
-        return Response(ser_data.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SignupStepOneView(APIView):
