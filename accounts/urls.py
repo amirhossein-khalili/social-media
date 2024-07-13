@@ -9,4 +9,10 @@ urlpatterns = [
     path("login/", views.LoginView.as_view(), name="token_obtain_pair"),
     path("signup/step1/", views.SignupStepOneView.as_view(), name="signup_step_one"),
     path("signup/step2/", views.SignupStepTwoView.as_view(), name="signup_step_two"),
+    #### profile parts #####
+    path(
+        "profile/<str:action>/<int:user_id>/",
+        views.FollowUnfollowView.as_view(),
+        name="follow-unfollow",
+    ),
 ]
