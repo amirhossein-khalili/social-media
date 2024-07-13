@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, permissions, status, views
+from rest_framework import generics, serializers, status, views
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
@@ -8,8 +8,8 @@ from rest_framework.views import APIView
 from permissions import IsOwnerReadOnly
 
 from . import error_messages
-from .models import Post
-from .serializers import PostDetailSerializer, PostSerializer
+from .models import Comment, Post
+from .serializers import CommentSerializer, PostDetailSerializer, PostSerializer
 
 
 class PostCreateView(APIView):
@@ -150,3 +150,43 @@ class ExploreView(APIView):
         return Response(
             {"message": "this is Explore of posts"}, status=status.HTTP_200_OK
         )
+
+
+class CommentCreateView(APIView):
+
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_post(self, post_id):
+        try:
+            return Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            raise serializers.ValidationError("Post not found")
+
+    def post(self, request, *args, **kwargs):
+        post_id = kwargs.get("post_id")
+        post = self.get_post(post_id)
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user, post=post)
+            return Response(serializer.data)
+        return Response(serializer.errors)
+
+
+class CommentReplyCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        parent_comment_id = self.kwargs.get("comment_id")
+        parent_comment = Comment.objects.get(id=parent_comment_id)
+
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(
+                user=request.user,
+                post=parent_comment.post,
+                reply=parent_comment,
+                is_reply=True,
+            )
+            return Response(serializer.data)
+        return Response(serializer.errors)
