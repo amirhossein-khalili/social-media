@@ -1,17 +1,16 @@
 import logging
 
-import redis
 from django.core.cache import cache
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions, status, views
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from utils import code_generator, redis_instance
+from utils import code_generator
 
 from .models import User
 from .serializers import (
