@@ -23,14 +23,15 @@ class PostSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = [
-            "id",
-            "user",
-            "body",
-            "created",
-            "is_reply",
-            "reply",
-        ]
+        fields = ["id", "user", "body", "created", "is_reply", "reply"]
+        read_only_fields = ["id", "user", "created"]
+
+    def validate(self, data):
+        if data.get("is_reply") and not data.get("reply"):
+            raise serializers.ValidationError(
+                "Reply field is required if is_reply is True"
+            )
+        return data
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -38,6 +39,17 @@ class CommentSerializer(serializers.ModelSerializer):
             "username": instance.user.username,
             "email": instance.user.email,
         }
+
+        if instance.reply is not None:
+            representation["reply"] = {
+                "body": instance.reply.body,
+                "created": instance.reply.created,
+                "is_reply": instance.reply.is_reply,
+                "reply": instance.reply.reply,
+            }
+        else:
+            representation["reply"] = None
+
         return representation
 
 
