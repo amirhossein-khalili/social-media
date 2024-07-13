@@ -9,7 +9,7 @@ from permissions import IsOwnerReadOnly
 
 from . import error_messages
 from .models import Post
-from .serializers import PostSerializer
+from .serializers import PostDetailSerializer, PostSerializer
 
 
 class PostCreateView(APIView):
@@ -18,7 +18,7 @@ class PostCreateView(APIView):
 
     def post(self, request):
         data = request.data.copy()
-        data["author"] = request.user.id
+        data["user"] = request.user.id
         ser_data = self.serializer_class(data=data)
 
         if ser_data.is_valid():
@@ -36,14 +36,14 @@ class PostUpdateView(generics.UpdateAPIView):
         user = self.request.user
         if user.is_superuser:
             return Post.objects.all()
-        return Post.objects.filter(author=user)
+        return Post.objects.filter(user=user)
 
     def update(self, request, *args, **kwargs):
         try:
             pk = kwargs.get("pk")
             post = Post.objects.get(pk=pk)
 
-            if not request.user.is_superuser and post.author != request.user:
+            if not request.user.is_superuser and post.user != request.user:
                 raise PermissionError
 
             serializer = self.get_serializer(post, data=request.data, partial=True)
@@ -84,7 +84,7 @@ class PostListView(generics.ListAPIView):
     #         if user.is_superuser:
     #             return Post.objects.all()
     #         else:
-    #             return Post.objects.filter(author=user)
+    #             return Post.objects.filter(user=user)
 
     # except Exception as e:
     #     print(error_messages.SERVER_ERROR)
@@ -99,14 +99,14 @@ class PostDestroyView(generics.DestroyAPIView):
         user = self.request.user
         if user.is_superuser:
             return Post.objects.all()
-        return Post.objects.filter(author=user)
+        return Post.objects.filter(user=user)
 
     def destroy(self, request, *args, **kwargs):
         try:
             pk = kwargs.get("pk")
             post = Post.objects.get(pk=pk)
 
-            if not request.user.is_superuser and post.author != request.user:
+            if not request.user.is_superuser and post.user != request.user:
                 raise PermissionError
 
             post.delete()
@@ -133,7 +133,7 @@ class PostDestroyView(generics.DestroyAPIView):
 
 class PostDetailView(generics.RetrieveAPIView):
     queryset = Post.objects.all()
-    serializer_class = PostSerializer
+    serializer_class = PostDetailSerializer
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
