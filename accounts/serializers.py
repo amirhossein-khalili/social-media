@@ -1,6 +1,7 @@
 from typing import Any, Dict
 
 from django.contrib import auth
+from django.contrib.auth import authenticate
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -92,16 +93,26 @@ class SignupStepTwoSerializer(serializers.Serializer):
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+
     def validate(self, attrs: Dict[str, Any]) -> Dict[str, str]:
-        data = super().validate(attrs)
+        username = attrs.get("username")
+        password = attrs.get("password")
 
-        refresh = self.get_token(self.user)
+        user = authenticate(
+            request=self.context.get("request"), username=username, password=password
+        )
 
+        if not user:
+            raise serializers.ValidationError(
+                "No active account found with the given credentials"
+            )
+
+        refresh = self.get_token(user)
+
+        data = {}
         data["login-token"] = str(refresh.access_token)
 
         if api_settings.UPDATE_LAST_LOGIN:
-            update_last_login(None, self.user)
-
-        data.pop("refresh", None)
+            update_last_login(None, user)
 
         return data
