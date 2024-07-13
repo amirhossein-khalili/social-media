@@ -20,6 +20,7 @@ from .serializers import (
     SignupStepTwoSerializer,
     UserRegisterSerializer,
 )
+from .services import RelationFactory
 
 logger = logging.getLogger(__name__)
 
@@ -222,3 +223,26 @@ class SignupStepTwoView(APIView):
 
 class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+
+
+class FollowUnfollowView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, action, user_id):
+        from_user = request.user
+        to_user = User.objects.get(id=user_id)
+
+        try:
+            action_func = RelationFactory.get_action(action)
+            if action_func(from_user, to_user):
+                return Response(
+                    {"success": f"User {action}ed successfully"},
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(
+                    {"error": f"User already {action}ed or action not possible"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
