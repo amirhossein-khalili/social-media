@@ -8,8 +8,6 @@ class User(AbstractUser):
     phone_number = models.CharField(max_length=15, unique=True, null=True, blank=True)
 
     bio = models.CharField(max_length=200, blank=True)
-    followers_count = models.IntegerField(default=0)
-    followings_count = models.IntegerField(default=0)
     posts_count = models.IntegerField(default=0)
     description = models.CharField(max_length=200, blank=True)
     is_private = models.BooleanField(default=False)
@@ -19,6 +17,18 @@ class User(AbstractUser):
     class Meta:
         verbose_name = "user"
         verbose_name_plural = "users"
+
+    def get_followers_count(self):
+        return User.objects.filter(following_relations__to_user=self).count()
+
+    def get_followers(self):
+        return User.objects.filter(following_relations__to_user=self)
+
+    def get_followings_count(self):
+        return User.objects.filter(follower_relations__from_user=self).count()
+
+    def get_followings(self):
+        return User.objects.filter(follower_relations__from_user=self)
 
 
 class Relation(models.Model):
