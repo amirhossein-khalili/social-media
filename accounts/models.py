@@ -30,6 +30,9 @@ class User(AbstractUser):
     def get_followings(self):
         return User.objects.filter(follower_relations__from_user=self)
 
+    def get_posts_count(self):
+        return User.objects.filter(posts__user=self).count()
+
 
 class Relation(models.Model):
     from_user = models.ForeignKey(
