@@ -21,6 +21,11 @@ urlpatterns = [
         name="follow-unfollow",
     ),
     path(
+        "profile/",
+        views.ProfileUpdateView.as_view(),
+        name="edit_profile",
+    ),
+    path(
         "profile/<int:pk>/",
         views.ProfileUserView.as_view(),
         name="user_profile",

@@ -94,9 +94,9 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
 
-    followers_count = serializers.SerializerMethodField()
-    followings_count = serializers.SerializerMethodField()
-    posts_count = serializers.SerializerMethodField()
+    followers_count = serializers.SerializerMethodField(read_only=True)
+    followings_count = serializers.SerializerMethodField(read_only=True)
+    posts_count = serializers.SerializerMethodField(read_only=True)
     posts = PostSerializer(many=True, read_only=True)
 
     class Meta:
@@ -106,6 +106,8 @@ class ProfileSerializer(serializers.ModelSerializer):
             "username",
             "first_name",
             "last_name",
+            "bio",
+            "email",
             "followers_count",
             "followings_count",
             "posts_count",
