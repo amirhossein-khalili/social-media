@@ -8,8 +8,13 @@ from rest_framework.views import APIView
 from permissions import IsOwnerReadOnly
 
 from . import error_messages
-from .models import Comment, Post
-from .serializers import CommentSerializer, PostDetailSerializer, PostSerializer
+from .models import Comment, Like, Post
+from .serializers import (
+    CommentSerializer,
+    LikeSerializer,
+    PostDetailSerializer,
+    PostSerializer,
+)
 
 
 class PostCreateView(APIView):
@@ -190,3 +195,27 @@ class CommentReplyCreateView(APIView):
             )
             return Response(serializer.data)
         return Response(serializer.errors)
+
+
+class LikeCreateView(APIView):
+    serializer_class = LikeSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_post(self, post_id):
+        return get_object_or_404(Post, id=post_id)
+
+    def post(self, request, *args, **kwargs):
+        post_id = kwargs.get("post_id")
+        post = self.get_post(post_id)
+        user = request.user
+
+        # Check if the user already liked the post
+        try:
+            like = Like.objects.get(user=user, post=post)
+            like.delete()
+            return Response({"message": "Post unliked"})
+        except Like.DoesNotExist:
+            Like.objects.create(user=user, post=post)
+            return Response({"message": "Post liked"})
+
+        return Response(serializer.errors, status=400)
