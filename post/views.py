@@ -147,6 +147,22 @@ class PostDetailView(generics.RetrieveAPIView):
         return post
 
 
+class PostSearchView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PostSerializer
+
+    def get(self, request):
+        query = request.GET.get("q")
+        if query:
+
+            posts = Post.objects.filter(content__icontains=query)
+            serializer = self.serializer_class(posts, many=True)
+            return Response(serializer.data)
+
+        else:
+            return Response({"error": "No query parameter provided"}, status=400)
+
+
 class ExploreView(APIView):
 
     serializer_class = PostSerializer
