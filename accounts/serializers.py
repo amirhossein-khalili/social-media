@@ -7,7 +7,13 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.settings import api_settings
 
+from post.serializers import PostSerializer
+
 from .models import User
+
+# ==================================================
+#   Authentication
+# ==================================================
 
 
 class SignupStepOneSerializer(serializers.Serializer):
@@ -79,3 +85,34 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             update_last_login(None, user)
 
         return data
+
+
+# ==================================================
+#   Profile Part
+# ==================================================
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+
+    followers_count = serializers.SerializerMethodField()
+    followings_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "followers_count",
+            "followings_count",
+        ]
+
+    def get_followers_count(self, obj):
+        return obj.get_followers_count()
+
+    def get_followings_count(self, obj):
+        return obj.get_followings_count()
+
+
+# ==================================================
