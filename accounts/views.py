@@ -15,12 +15,18 @@ from utils import code_generator
 from .models import User
 from .serializers import (
     CustomTokenObtainPairSerializer,
+    ProfileSerializer,
     SignupStepOneSerializer,
     SignupStepTwoSerializer,
 )
 from .services import RelationFactory
 
 logger = logging.getLogger(__name__)
+
+
+# ==================================================
+#   Authentication
+# ==================================================
 
 
 class SignupStepOneView(APIView):
@@ -203,6 +209,11 @@ class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
 
+# ==================================================
+#   Profile Part
+# ==================================================
+
+
 class FollowUnfollowView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -224,3 +235,12 @@ class FollowUnfollowView(APIView):
                 )
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProfileUserView(generics.RetrieveAPIView):
+    serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated]
+    queryset = User.objects.all()
+
+
+# ==================================================
