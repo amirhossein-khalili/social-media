@@ -20,4 +20,5 @@ urlpatterns = [
         views.CommentReplyCreateView.as_view(),
         name="reply-comment",
     ),
+    path("like/<int:post_id>", views.LikeCreateView.as_view(), name="like"),
 ]
