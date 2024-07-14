@@ -42,6 +42,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
         if instance.reply is not None:
             representation["reply"] = {
+                "id": instance.reply.id,
                 "body": instance.reply.body,
                 "created": instance.reply.created,
                 "is_reply": instance.reply.is_reply,
@@ -55,6 +56,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class PostDetailSerializer(serializers.ModelSerializer):
     postcomments = CommentSerializer(many=True, read_only=True)
+    likes_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
@@ -67,7 +69,11 @@ class PostDetailSerializer(serializers.ModelSerializer):
             "created",
             "updated",
             "postcomments",
+            "likes_count",
         ]
+
+    def get_likes_count(self, obj):
+        return obj.likes_count()
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -81,3 +87,9 @@ class PostDetailSerializer(serializers.ModelSerializer):
             "email": instance.user.email,
         }
         return representation
+
+
+class LikeSerializer(serializers.Serializer):
+
+    class Meta:
+        fields = "__all__"
