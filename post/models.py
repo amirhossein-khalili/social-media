@@ -15,13 +15,16 @@ class Post(models.Model):
     def __str__(self):
         return f"Post by {self.user.username} at {self.created}"
 
+    def likes_count(self):
+        return self.plikes.count()
+
     def get_absolute_url(self):
         return reverse("post:detail", kwargs={"pk": self.pk})
 
     class Meta:
         ordering = ["content"]
 
- 
+
 class Comment(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="usercomments"
@@ -32,7 +35,7 @@ class Comment(models.Model):
     reply = models.ForeignKey(
         "self",
         on_delete=models.CASCADE,
-        related_name="rcomments",
+        related_name="replycomments",
         blank=True,
         null=True,
     )
@@ -42,3 +45,26 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.user.username} on {self.post.id}"
+
+    def likes_count(self):
+        return self.plikes.count()
+
+
+class Like(models.Model):
+
+    # class VoteType(models.TextChoices):
+    #     LIKE = "like", "Like"
+    #     DISLIKE = "dislike", "Dislike"
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="ulikes"
+    )
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="plikes")
+    # type = models.CharField(
+    #     max_length=7,
+    #     choices=VoteType.choices,
+    #     default=VoteType.LIKE,
+    # )
+
+    def __str__(self):
+        return f"{self.user} - {self.post}"
